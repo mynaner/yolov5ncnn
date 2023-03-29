@@ -1,0 +1,4 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.yolov5ncnn.yolov5ncnn">
+    <uses-permission android:name="android.permission.CAMERA" />
+</manifest>
