@@ -20,22 +20,22 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   _cameras = await availableCameras();
-  runApp( MyApp());
+  runApp(MyApp());
 }
 
 @pragma('vm:entry-point')
-Future<bool?> expansiveWork(Map<String,dynamic> arguments) async {
+Future<bool?> expansiveWork(Map<String, dynamic> arguments) async {
   print(arguments["rootIsolateToken"]);
-  BackgroundIsolateBinaryMessenger.ensureInitialized(arguments["rootIsolateToken"]);
- var res =  await arguments["yolov5ncnn"].init();
- // port.send("res");
- //  print(arguments);
+  BackgroundIsolateBinaryMessenger.ensureInitialized(
+      arguments["rootIsolateToken"]);
+  var res = await arguments["yolov5ncnn"].init();
+  // port.send("res");
+  //  print(arguments);
   return res;
 }
 
-
 class MyApp extends StatefulWidget {
-   MyApp({super.key});
+  MyApp({super.key});
   @override
   State<MyApp> createState() => _MyAppState();
 }
@@ -45,15 +45,14 @@ class _MyAppState extends State<MyApp> {
   CameraController? controller;
   RootIsolateToken? rootIsolateToken = RootIsolateToken.instance;
 
-  Yolov5ncnn yolov5ncnn =  Yolov5ncnn();
+  Yolov5ncnn yolov5ncnn = Yolov5ncnn();
   bool isInt = false;
   List<YolovResult> datalist = [];
   File? newimage;
-  int num=0;
+  int num = 0;
   @override
   void initState() {
     super.initState();
-
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -73,7 +72,6 @@ class _MyAppState extends State<MyApp> {
     //   print(value);
     // });
 
-
     // var isolate = await FlutterIsolate.spawn(spawnIsolate, port.sendPort);
     // print(isolate);
   }
@@ -86,16 +84,19 @@ class _MyAppState extends State<MyApp> {
 
   Future onCarams() async {
     final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
-    if(photo==null) return;
+    if (photo == null) return;
 
+    var time = DateTime.now();
 
-    var time =DateTime.now();
+    Bitmap bitmap = await Bitmap.fromProvider(FileImage(File(photo.path)));
 
-    Bitmap bitmap =await  Bitmap.fromProvider(FileImage(File(photo.path)));
+    var data = await yolov5ncnn.detect(bitmap, false);
 
-   var data =  await yolov5ncnn.detect(bitmap,false);
-   print(DateTime.now().microsecond -time.microsecond);
-   print(data);
+    setState(() {
+      datalist = data;
+    });
+    print(DateTime.now().microsecond - time.microsecond);
+    print(data);
   }
 
   @override
@@ -105,7 +106,7 @@ class _MyAppState extends State<MyApp> {
           appBar: AppBar(
             title: const Text('Plugin example app'),
           ),
-          bottomNavigationBar:  IconButton(
+          bottomNavigationBar: IconButton(
             icon: Icon(Icons.add),
             color: isInt ? Colors.brown : Colors.amber,
             onPressed: onClick,
@@ -115,7 +116,7 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 child: Text("初始化"),
                 onPressed: initPlatformState,
-              ),  
+              ),
               Column(
                 children: datalist
                     .map(
@@ -128,10 +129,9 @@ class _MyAppState extends State<MyApp> {
               ),
               ElevatedButton(onPressed: onCarams, child: Text("拍照")),
               Text("$num"),
+              Text("${datalist.join()}")
             ],
           )),
     );
   }
 }
-
-
