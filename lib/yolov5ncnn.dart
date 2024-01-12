@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:bitmap/bitmap.dart';
 import 'package:flutter/services.dart';
@@ -8,8 +7,7 @@ import 'package:yolov5ncnn/YolovResult_modal.dart';
 class Yolov5ncnn {
   final methodChannel = const MethodChannel('yolov5ncnn');
 
-   Future<bool?> init() async {
-    print(" 开始初始化");
+  Future<bool?> init() async {
     return await methodChannel.invokeMethod<bool>('init');
   }
 
