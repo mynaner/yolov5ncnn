@@ -1,31 +1,23 @@
 import 'dart:io';
-import 'dart:isolate';
-import 'dart:math';
-import 'dart:ui';
-
 import 'package:bitmap/bitmap.dart';
 import 'package:camera/camera.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_isolate/flutter_isolate.dart';
 import 'dart:async';
 import 'package:image_picker/image_picker.dart';
-import 'package:isolate_flutter/isolate_flutter.dart';
 import 'package:yolov5ncnn/YolovResult_modal.dart';
 import 'package:yolov5ncnn/yolov5ncnn.dart';
 
-late List<CameraDescription> _cameras;
+late List<CameraDescription> cameras;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  _cameras = await availableCameras();
-  runApp(MyApp());
+  cameras = await availableCameras();
+  runApp(const MyApp());
 }
 
 @pragma('vm:entry-point')
 Future<bool?> expansiveWork(Map<String, dynamic> arguments) async {
-  print(arguments["rootIsolateToken"]);
   BackgroundIsolateBinaryMessenger.ensureInitialized(
       arguments["rootIsolateToken"]);
   var res = await arguments["yolov5ncnn"].init();
@@ -35,7 +27,7 @@ Future<bool?> expansiveWork(Map<String, dynamic> arguments) async {
 }
 
 class MyApp extends StatefulWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
   @override
   State<MyApp> createState() => _MyAppState();
 }
@@ -86,8 +78,6 @@ class _MyAppState extends State<MyApp> {
     final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
     if (photo == null) return;
 
-    var time = DateTime.now();
-
     Bitmap bitmap = await Bitmap.fromProvider(FileImage(File(photo.path)));
 
     var data = await yolov5ncnn.detect(bitmap, false);
@@ -95,8 +85,6 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       datalist = data;
     });
-    print(DateTime.now().microsecond - time.microsecond);
-    print(data);
   }
 
   @override
@@ -107,15 +95,15 @@ class _MyAppState extends State<MyApp> {
             title: const Text('Plugin example app'),
           ),
           bottomNavigationBar: IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             color: isInt ? Colors.brown : Colors.amber,
             onPressed: onClick,
           ),
           body: ListView(
             children: [
               ElevatedButton(
-                child: Text("初始化"),
                 onPressed: initPlatformState,
+                child: const Text("初始化"),
               ),
               Column(
                 children: datalist
@@ -127,9 +115,9 @@ class _MyAppState extends State<MyApp> {
                     )
                     .toList(),
               ),
-              ElevatedButton(onPressed: onCarams, child: Text("拍照")),
+              ElevatedButton(onPressed: onCarams, child: const Text("拍照")),
               Text("$num"),
-              Text("${datalist.join()}")
+              Text(datalist.join())
             ],
           )),
     );

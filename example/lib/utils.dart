@@ -1,3 +1,9 @@
+/*
+ * @Date: 2023-03-23 17:40:09
+ * @LastEditors: dengxin 994386508@qq.com
+ * @LastEditTime: 2024-01-15 11:17:28
+ * @FilePath: /yolov5ncnn/example/lib/utils.dart
+ */
 import 'dart:io';
 
 import 'package:camera/camera.dart';
@@ -63,9 +69,9 @@ class ImageUtils {
     b = b.clamp(0, 255);
 
     return 0xff000000 |
-    ((b << 16) & 0xff0000) |
-    ((g << 8) & 0xff00) |
-    (r & 0xff);
+        ((b << 16) & 0xff0000) |
+        ((g << 8) & 0xff00) |
+        (r & 0xff);
   }
 
   static void saveImage(imageLib.Image image, [int i = 0]) async {
@@ -74,6 +80,5 @@ class ImageUtils {
     final appPath = appDir.path;
     final fileOnDevice = File('$appPath/out$i.jpg');
     await fileOnDevice.writeAsBytes(jpeg, flush: true);
-    print('Saved $appPath/out$i.jpg');
   }
 }
